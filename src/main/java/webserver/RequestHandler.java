@@ -69,10 +69,15 @@ public class RequestHandler extends Thread {
                 DataOutputStream dos = new DataOutputStream(out);
                 response302Header(dos);
             }
+            // * 로그인 POST 방식
+            else if("/user/login".equals(url)) {
+                url = loginController.login(IOUtils.readData(br, contentLength));
+                DataOutputStream dos = new DataOutputStream(out);
+                response302LoginSuccessHeader(dos);
+            }
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-            // byte[] body = "Hello World".getBytes();
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
@@ -89,6 +94,17 @@ public class RequestHandler extends Thread {
     private void response302Header(DataOutputStream dos) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: /index.html \r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private void response302LoginSuccessHeader(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Set-Cookie: logined=true \r\n");
             dos.writeBytes("Location: /index.html \r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {

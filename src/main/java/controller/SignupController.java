@@ -6,10 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import model.User;
+import db.DataBase;
 import util.HttpRequestUtils;
 
 public class SignupController {
     private static final Logger log = LoggerFactory.getLogger(SignupController.class);
+    private static final DataBase Database = new DataBase();
 
     /**
      * 회원가입
@@ -39,8 +41,6 @@ public class SignupController {
      * @return 1: 성공, 0: 실패
      */
     public String postSignup(String body){
-        log.info("body => {}", body);
-
         Map<String, String> bodyParams = HttpRequestUtils.parseQueryString(body);
         User user = new User(bodyParams.get("userId"), bodyParams.get("password"), 
         bodyParams.get("name"), bodyParams.get("email"));
@@ -50,6 +50,7 @@ public class SignupController {
             return "/user/create_failed.html";
         }
 
+        Database.addUser(user);
         log.info("user => {}", user);
         return "/index.html";
     }
